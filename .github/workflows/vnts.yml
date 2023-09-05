@@ -1,0 +1,86 @@
+name: Build and Release
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      ver: ${{ steps.getversion.outputs.ver }}
+      cver: ${{ steps.getversion.outputs.cver }}
+    steps:
+      -
+        name: Get version
+        id: getversion
+        run: |
+          ver=`curl https://api.github.com/repos/lbl8603/vnts/releases/latest | jq -r '.tag_name'`
+          #vntsv=`curl https://api.github.com/repos/lbl8603/vnts/releases/latest | grep 'tag_name' | cut -d\" -f4`
+          cver=`curl https://api.github.com/repos/lmq8267/vnts/releases/latest | jq -r '.tag_name'`
+          echo "ver=${ver}" >> $GITHUB_OUTPUT
+          echo "cver=${cver}" >> $GITHUB_OUTPUT
+
+  build:
+    runs-on: ubuntu-latest
+    needs: check
+    if: ${{ needs.check.outputs.ver != needs.check.outputs.cver }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      - name: Init submodules
+        uses: snickerbockers/submodules-init@v4
+      - name: Cargo cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ./target
+          key: build-cargo-registry-mipsel-unknown-linux-musl
+      - name: List
+        run: find ./
+      - 
+        name: Build
+        run: |
+          sudo apt-get update 
+          sudo apt-get install gcc-mipsel-linux-gnu
+          rustup target add mipsel-unknown-linux-musl
+          cat >>~/.cargo/config <<EOF
+          [target.mipsel-unknown-linux-musl]
+          linker = "mipsel-linux-gnu-gcc"
+          rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols","--cfg","aes_armv8"]
+          EOF
+          git clone https://github.com/lbl8603/vnts -b ${{ needs.check.outputs.ver }} /opt/vnts
+          #git clone https://github.com/lbl8603/vnts -b $vntsv /opt/vnts
+          git clone https://github.com/lmq8267/cloudflared.git /opt/st
+          tar -xvf /opt/st/upx-3.95-amd64_linux.tar.xz -C /opt
+          chmod 777 /opt/upx-3.95-amd64_linux/upx
+          chmod 777 /opt/st/strip
+          mkdir -p /opt/vnts-mipsel
+          cd /opt/vnts
+          sed -i 's|moka = "0.9.6"|moka = { version = "0.11.3", default-features = false, features = ["sync"] }|g' Cargo.toml
+          cargo build --target=mipsel-unknown-linux-musl --release
+          cp -f /opt/vnts/target/mipsel-unknown-linux-musl/release/vnts /opt/vnts-mipsel/vnts
+          #cd /opt/vnts
+          #cargo build --release --verbose --target mipsel-unknown-linux-musl --features normal
+          #mv ./target/$TARGET/release/vnts mkdir -p /opt/vnt-mipsel/vnts
+           cd /opt/vnts-mipsel
+          /opt/st/strip /opt/vnts-mipsel/vnts
+          #/opt/st/strip /opt/vnt-mipsel/vnts
+          /opt/upx-3.95-amd64_linux/upx --lzma --best vnts
+          #/opt/upx-3.95-amd64_linux/upx --lzma --best vnts
+          echo $(md5sum vnts-cli | awk '{print $1;}') >MD5.txt
+          #echo $(md5sum vnts | awk '{print $1;}') >vnts.txt
+      - 
+        name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.c8 }}
+          tag_name: ${{ needs.check.outputs.ver }}
+          files: |
+              /opt/vnts-mipsel/vnts
+              /opt/vnts-mipsel/MD5.txt
+              #/opt/vnt-mipsel/vnts
+              #/opt/vnt-mipsel/vnts.txt

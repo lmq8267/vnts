@@ -71,7 +71,7 @@ jobs:
           #/opt/st/strip /opt/vnt-mipsel/vnts
           /opt/upx-3.95-amd64_linux/upx --lzma --best vnts
           #/opt/upx-3.95-amd64_linux/upx --lzma --best vnts
-          echo $(md5sum vnts-cli | awk '{print $1;}') >MD5.txt
+          echo $(md5sum vnts | awk '{print $1;}') >MD5.txt
           #echo $(md5sum vnts | awk '{print $1;}') >vnts.txt
       - 
         name: Release

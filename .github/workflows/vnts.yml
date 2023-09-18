@@ -50,7 +50,7 @@ jobs:
           cat >>~/.cargo/config <<EOF
           [target.mipsel-unknown-linux-musl]
           linker = "mipsel-linux-gnu-gcc"
-          rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols","--cfg","aes_armv8"]
+          rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"]
           EOF
           git clone https://github.com/lbl8603/vnts -b ${{ needs.check.outputs.ver }} /opt/vnts
           #git clone https://github.com/lbl8603/vnts -b $vntsv /opt/vnts

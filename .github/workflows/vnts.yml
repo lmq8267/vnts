@@ -53,7 +53,6 @@ jobs:
           rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"]
           EOF
           git clone https://github.com/lbl8603/vnts -b ${{ needs.check.outputs.ver }} /opt/vnts
-          #git clone https://github.com/lbl8603/vnts -b $vntsv /opt/vnts
           git clone https://github.com/lmq8267/cloudflared.git /opt/st
           tar -xvf /opt/st/upx-3.95-amd64_linux.tar.xz -C /opt
           chmod 777 /opt/upx-3.95-amd64_linux/upx
@@ -61,18 +60,12 @@ jobs:
           mkdir -p /opt/vnts-mipsel
           cd /opt/vnts
           sed -i 's|moka = "0.9.6"|moka = { version = "0.11.3", default-features = false, features = ["sync"] }|g' Cargo.toml
-          cargo build --target=mipsel-unknown-linux-musl --release
+          cargo build --target=mipsel-unknown-linux-musl --release --verbose --features normal
           cp -f /opt/vnts/target/mipsel-unknown-linux-musl/release/vnts /opt/vnts-mipsel/vnts
-          #cd /opt/vnts
-          #cargo build --release --verbose --target mipsel-unknown-linux-musl --features normal
-          #mv ./target/$TARGET/release/vnts mkdir -p /opt/vnt-mipsel/vnts
            cd /opt/vnts-mipsel
           /opt/st/strip /opt/vnts-mipsel/vnts
-          #/opt/st/strip /opt/vnt-mipsel/vnts
           /opt/upx-3.95-amd64_linux/upx --lzma --best vnts
-          #/opt/upx-3.95-amd64_linux/upx --lzma --best vnts
           echo $(md5sum vnts | awk '{print $1;}') >MD5.txt
-          #echo $(md5sum vnts | awk '{print $1;}') >vnts.txt
       - 
         name: 发布
         uses: softprops/action-gh-release@v1

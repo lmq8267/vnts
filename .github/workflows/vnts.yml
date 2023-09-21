@@ -60,7 +60,7 @@ jobs:
           mkdir -p /opt/vnts-mipsel
           cd /opt/vnts
           sed -i 's|moka = "0.9.6"|moka = { version = "0.11.3", default-features = false, features = ["sync"] }|g' Cargo.toml
-          cargo build --target=mipsel-unknown-linux-musl --release --verbose --features normal
+          cargo build --target=mipsel-unknown-linux-musl --release --features normal
           cp -f /opt/vnts/target/mipsel-unknown-linux-musl/release/vnts /opt/vnts-mipsel/vnts
            cd /opt/vnts-mipsel
           /opt/st/strip /opt/vnts-mipsel/vnts

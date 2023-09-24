@@ -4,6 +4,8 @@ on:
   schedule:
     - cron: '0 3,20 * * *'
   workflow_dispatch:
+env:
+  TZ: Asia/Shanghai
 
 jobs:
   check:
@@ -66,17 +68,17 @@ jobs:
           /opt/st/strip /opt/vnts-mipsel/vnts
           /opt/upx-3.95-amd64_linux/upx --lzma --best vnts
           echo $(md5sum vnts | awk '{print $1;}') >MD5.txt
+          echo "build_time=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
       - 
         name: 发布
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.c8 }}
+          body:  编译时间 ：${{ env.build_time }}
           tag_name: ${{ needs.check.outputs.ver }}
           files: |
               /opt/vnts-mipsel/vnts
               /opt/vnts-mipsel/MD5.txt
-              #/opt/vnt-mipsel/vnts
-              #/opt/vnt-mipsel/vnts.txt
       - 
        name: 删除工作流
        uses: GitRML/delete-workflow-runs@main

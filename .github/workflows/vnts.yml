@@ -74,7 +74,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.c8 }}
-          body:  编译时间 ：${{ env.build_time }}
+          body: |
+           > ### 编译时间 ：${{ env.build_time }}
+
+           **[官方更新说明](https://github.com/lbl8603/vnts/releases)**
           tag_name: ${{ needs.check.outputs.ver }}
           files: |
               /opt/vnts-mipsel/vnts

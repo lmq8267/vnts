@@ -1,8 +1,8 @@
 name: 编译压缩版vnts
 
 on:
-  #schedule:
-    #- cron: '0 3,20 * * *'
+  schedule:
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 env:

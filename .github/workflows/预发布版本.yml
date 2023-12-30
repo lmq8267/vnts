@@ -44,11 +44,9 @@ jobs:
           - TARGET: i686-unknown-linux-musl
             OS: ubuntu-latest
             FEATURES: normal
-            STRIP: i686-linux-musl-strip
           - TARGET: x86_64-unknown-linux-musl
             OS: ubuntu-latest
-            FEATURES: ring-cipher
-            STRIP: x86_64-linux-musl-strip
+            FEATURES: normal
     runs-on: ${{ matrix.OS }}
     env:
       NAME: vnts_${{ matrix.TARGET }}
@@ -131,12 +129,14 @@ jobs:
       - name: 打包压缩
         run: |
           mkdir -p /opt/upx
+          if [[ $TARGET != "x86_64-unknown-linux-musl" ]] && [[ $TARGET != "i686-unknown-linux-musl" ]] ; then
           git clone https://github.com/lmq8267/cloudflared.git /opt/st
           tar -xvf /opt/st/upx-3.95-amd64_linux.tar.xz -C /opt
           chmod 777 /opt/upx-3.95-amd64_linux/upx
           tar -xvf /opt/st/upx-4.1.0-amd64_linux.tar.xz -C /opt
           chmod 777 /opt/upx-4.1.0-amd64_linux/upx
           chmod 777 /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP}
+          fi
           mv /opt/vnts/target/${TARGET}/release/vnts /opt/upx/${NAME}
           cd /opt/upx
           if [[ $TARGET != "x86_64-unknown-linux-musl" ]] && [[ $TARGET != "i686-unknown-linux-musl" ]] ; then

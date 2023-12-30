@@ -83,12 +83,15 @@ jobs:
                 MUSL_URI=mips-linux-musl-cross
                 ;;
             esac
+            if [[ $TARGET =~ "x86_64-unknown-linux-musl" ]] || [[ $TARGET =~ "i686-unknown-linux-musl" ]] ; then
+              sudo apt-get update && sudo apt-get install -qq musl-tools
+            else
               echo "MUSL_URI=${MUSL_URI}" >> $GITHUB_ENV
               mkdir -p /opt/musl_gcc 
               wget -c https://musl.cc/$MUSL_URI.tgz -P /opt/musl_gcc/
               tar zxf /opt/musl_gcc/$MUSL_URI.tgz -C /opt/musl_gcc/
               sudo ln -s /opt/musl_gcc/$MUSL_URI/bin/*gcc /usr/bin/
-              sudo apt-get update && sudo apt-get install -qq musl-tools
+            fi
             cat >>~/.cargo/config <<EOF
             [target.x86_64-unknown-linux-musl]
             rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"]

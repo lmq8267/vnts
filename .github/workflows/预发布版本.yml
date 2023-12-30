@@ -139,11 +139,13 @@ jobs:
           chmod 777 /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP}
           mv /opt/vnts/target/${TARGET}/release/vnts /opt/upx/${NAME}
           cd /opt/upx
+          if [[ $TARGET !=~ "x86_64-unknown-linux-musl" ]] || [[ $TARGET !=~ "i686-unknown-linux-musl" ]] ; then
           /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP} ${NAME}
           if [[ $TARGET == mips-unknown-linux-musl ]] || [[ $TARGET == mipsel-unknown-linux-musl ]] ; then
           /opt/upx-3.95-amd64_linux/upx --lzma --best ${NAME}
           else
           /opt/upx-4.1.0-amd64_linux/upx --lzma --best ${NAME}
+          fi
           fi
           echo "build_time=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
       - name: 发布
@@ -154,6 +156,7 @@ jobs:
            > ### 编译时间 ：${{ env.build_time }}
            
            这是开发版版本，各平台的压缩版程序
+           x86_64和i386未压缩
            
            -musleabi：只支持软件浮点的设备
            -musleabihf：支持硬件浮点的设备

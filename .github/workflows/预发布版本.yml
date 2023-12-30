@@ -139,7 +139,7 @@ jobs:
           chmod 777 /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP}
           mv /opt/vnts/target/${TARGET}/release/vnts /opt/upx/${NAME}
           cd /opt/upx
-          if [[ $TARGET !=~ "x86_64-unknown-linux-musl" ]] || [[ $TARGET !=~ "i686-unknown-linux-musl" ]] ; then
+          if [[ $TARGET != "x86_64-unknown-linux-musl" ]] && [[ $TARGET != "i686-unknown-linux-musl" ]] ; then
           /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP} ${NAME}
           if [[ $TARGET == mips-unknown-linux-musl ]] || [[ $TARGET == mipsel-unknown-linux-musl ]] ; then
           /opt/upx-3.95-amd64_linux/upx --lzma --best ${NAME}

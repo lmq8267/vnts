@@ -41,6 +41,14 @@ jobs:
             OS: ubuntu-latest
             FEATURES: normal
             STRIP: mips-linux-musl-strip
+          - TARGET: i686-unknown-linux-musl
+            OS: ubuntu-latest
+            FEATURES: normal
+            STRIP: i686-linux-musl-strip
+          - TARGET: x86_64-unknown-linux-musl
+            OS: ubuntu-latest
+            FEATURES: ring-cipher
+            STRIP: x86_64-linux-musl-strip
     runs-on: ${{ matrix.OS }}
     env:
       NAME: vnts_${{ matrix.TARGET }}
@@ -80,7 +88,12 @@ jobs:
               wget -c https://musl.cc/$MUSL_URI.tgz -P /opt/musl_gcc/
               tar zxf /opt/musl_gcc/$MUSL_URI.tgz -C /opt/musl_gcc/
               sudo ln -s /opt/musl_gcc/$MUSL_URI/bin/*gcc /usr/bin/
+              sudo apt-get update && sudo apt-get install -qq musl-tools
             cat >>~/.cargo/config <<EOF
+            [target.x86_64-unknown-linux-musl]
+            rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"]
+            [target.i686-unknown-linux-musl]
+            rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"] 
             [target.aarch64-unknown-linux-musl]
             linker = "aarch64-linux-musl-gcc"
             rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"]

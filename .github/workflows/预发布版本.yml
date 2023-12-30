@@ -163,8 +163,7 @@ jobs:
            
            [官方更新说明](https://github.com/lbl8603/vnts/releases)
            
-          #tag_name: ${{ env.tag }}
-          tag_name: 1.2.8.2
+          tag_name: ${{ env.tag }}
           prerelease: true
           files: |
               /opt/upx/*

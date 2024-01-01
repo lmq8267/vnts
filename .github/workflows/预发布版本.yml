@@ -90,6 +90,8 @@ jobs:
               tar zxf /opt/musl_gcc/$MUSL_URI.tgz -C /opt/musl_gcc/
               sudo ln -s /opt/musl_gcc/$MUSL_URI/bin/*gcc /usr/bin/
             fi
+            rustup self uninstall -y
+            rustup install 1.71.1
             cat >>~/.cargo/config <<EOF
             [target.x86_64-unknown-linux-musl]
             rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"]
@@ -119,8 +121,6 @@ jobs:
             EOF
       - name: 添加编译平台
         run: |
-          rustup self uninstall
-          rustup install 1.71.1
           rustup target add $TARGET
       - name: 开始编译
         run: |

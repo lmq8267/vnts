@@ -118,7 +118,9 @@ jobs:
             rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"]  
             EOF
       - name: 添加编译平台
-        run: rustup target add $TARGET
+        run: |
+          rustup install 1.71.1
+          rustup target add $TARGET
       - name: 开始编译
         run: |
           git clone https://github.com/lbl8603/vnts /opt/vnts

@@ -120,6 +120,10 @@ jobs:
       - name: 添加编译平台
         run: |
           rustup install 1.71.1
+          rm /home/runner/.cargo/bin/rust-analyzer
+          rm /home/runner/.cargo/bin/rustfmt
+          rm /home/runner/.cargo/bin/cargo-fmt
+          rustup update
           rustup target add $TARGET
       - name: 开始编译
         run: |

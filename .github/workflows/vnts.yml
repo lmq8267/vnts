@@ -97,6 +97,10 @@ jobs:
               wget -c https://musl.cc/$MUSL_URI.tgz -P /opt/musl_gcc/
               tar zxf /opt/musl_gcc/$MUSL_URI.tgz -C /opt/musl_gcc/
               sudo ln -s /opt/musl_gcc/$MUSL_URI/bin/*gcc /usr/bin/
+            cd $HOME
+            rm -rf .cargo .rustup
+            wget -q -c -P /opt/musl_gcc/ https://github.com/lmq8267/vnts/releases/download/1.2.1/rust-1.7.1.1.tar.gz
+            tar zxf /opt/musl_gcc/rust-1.7.1.1.tar.gz -C $HOME/
             cat >>~/.cargo/config <<EOF
             [target.aarch64-unknown-linux-musl]
             linker = "aarch64-linux-musl-gcc"

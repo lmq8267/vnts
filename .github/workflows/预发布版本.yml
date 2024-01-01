@@ -91,6 +91,7 @@ jobs:
               sudo ln -s /opt/musl_gcc/$MUSL_URI/bin/*gcc /usr/bin/
             fi
             rustup self uninstall -y
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
             rustup install 1.71.1
             cat >>~/.cargo/config <<EOF
             [target.x86_64-unknown-linux-musl]

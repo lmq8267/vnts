@@ -95,8 +95,8 @@ jobs:
             #wget -q -c -P /opt/musl_gcc/ https://github.com/lmq8267/vnts/releases/download/1.2.1/rust-1.7.1.1.tar.gz
             #tar zxf /opt/musl_gcc/rust-1.7.1.1.tar.gz -C $HOME/
             if [[ $TARGET == mips-unknown-linux-musl ]] || [[ $TARGET == mipsel-unknown-linux-musl ]] ; then
-            rustup install 1.74.0
-            rustup default 1.74.0
+            rustup install 1.73.0
+            rustup default 1.73.0
             fi
             cat >>~/.cargo/config <<EOF
             [target.x86_64-unknown-linux-musl]

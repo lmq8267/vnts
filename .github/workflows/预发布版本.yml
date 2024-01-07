@@ -6,7 +6,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   TZ: Asia/Shanghai
-  
+  tag: 1.2.8.4
 jobs:
  build:
     strategy:
@@ -90,10 +90,6 @@ jobs:
               tar zxf /opt/musl_gcc/$MUSL_URI.tgz -C /opt/musl_gcc/
               sudo ln -s /opt/musl_gcc/$MUSL_URI/bin/*gcc /usr/bin/
             fi
-            #cd $HOME
-            #rm -rf .cargo .rustup
-            #wget -q -c -P /opt/musl_gcc/ https://github.com/lmq8267/vnts/releases/download/1.2.1/rust-1.7.1.1.tar.gz
-            #tar zxf /opt/musl_gcc/rust-1.7.1.1.tar.gz -C $HOME/
             if [[ $TARGET == mips-unknown-linux-musl ]] || [[ $TARGET == mipsel-unknown-linux-musl ]] ; then
             rustup install 1.72.1
             rustup default 1.72.1
@@ -126,16 +122,13 @@ jobs:
             rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"]  
             EOF
       - name: 添加编译平台
-        run: |
-          rustc --version
-          cargo --version
-          rustup target add $TARGET
+        run: rustup target add $TARGET
       - name: 开始编译
         run: |
           git clone https://github.com/lbl8603/vnts /opt/vnts
           cd /opt/vnts
           sed -i 's|= "3.2.0"|= "=3.2.0"|g' ./Cargo.toml
-          echo "tag=$(grep -o 'version = "[^"]*' ./src/service/main_service/common.rs | sed 's/version = "//')" >> $GITHUB_ENV
+          #echo "tag=$(grep -o 'version = "[^"]*' ./src/service/main_service/common.rs | sed 's/version = "//')" >> $GITHUB_ENV
           cargo build --release --target $TARGET --features $FEATURES
       - name: 打包压缩
         run: |
@@ -166,7 +159,7 @@ jobs:
           body: |
            > ### 编译时间 ：${{ env.build_time }}
            
-           这是开发版版本，各平台的压缩版程序
+           这是预发布版本，各平台的压缩版程序
            x86_64和i386未压缩
            
            -musleabi：只支持软件浮点的设备
@@ -175,7 +168,7 @@ jobs:
            [官方更新说明](https://github.com/lbl8603/vnts/releases)
            
           #tag_name: ${{ env.tag }}
-          tag_name: 1.2.8.3
+          tag_name: ${{ env.tag }}
           prerelease: true
           files: |
               /opt/upx/*

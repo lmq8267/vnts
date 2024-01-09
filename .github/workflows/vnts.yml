@@ -101,6 +101,7 @@ jobs:
             rustup install 1.72.1
             rustup default 1.72.1
             fi
+            sudo timedatectl set-timezone "Asia/Shanghai"
             cat >>~/.cargo/config <<EOF
             [target.aarch64-unknown-linux-musl]
             linker = "aarch64-linux-musl-gcc"

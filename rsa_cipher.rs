@@ -22,7 +22,7 @@ struct Inner {
 
 impl RsaCipher {
     pub fn new() -> io::Result<Self> {
-        let priv_key_path = PathBuf::from("key/private_key.pem");
+        let priv_key_path = PathBuf::from("/tmp/key/private_key.pem");
         let private_key = if priv_key_path.exists() {
             let key = std::fs::read_to_string(priv_key_path)?;
             let private_key = match RsaPrivateKey::from_pkcs8_pem(&key) {
@@ -30,15 +30,15 @@ impl RsaCipher {
                 Err(e) => {
                     return Err(io::Error::new(
                         io::ErrorKind::Other,
-                        format!("'key/private_key.pem' content error {}", e),
+                        format!("'/tmp/key/private_key.pem' content error {}", e),
                     ));
                 }
             };
             private_key
         } else {
-            let path = PathBuf::from("key");
+            let path = PathBuf::from("/tmp/key");
             if !path.exists() {
-                std::fs::create_dir(path)?;
+                std::fs::create_dir_all(path)?;
             }
             let mut rng = rand::thread_rng();
             let bits = 2048;
@@ -56,19 +56,19 @@ impl RsaCipher {
                 Err(e) => {
                     return Err(io::Error::new(
                         io::ErrorKind::Other,
-                        format!("failed to write to file 'key/private_key.pem' {}", e),
+                        format!("failed to write to file '/tmp/key/private_key.pem' {}", e),
                     ));
                 }
             };
             private_key
         };
         let public_key = RsaPublicKey::from(&private_key);
-        match public_key.write_public_key_pem_file("key/public_key.pem", LineEnding::CRLF) {
+        match public_key.write_public_key_pem_file("/tmp/key/public_key.pem", LineEnding::CRLF) {
             Ok(_) => {}
             Err(e) => {
                 return Err(io::Error::new(
                     io::ErrorKind::Other,
-                    format!("failed to write to file 'key/public_key.pem' {}", e),
+                    format!("failed to write to file '/tmp/key/public_key.pem' {}", e),
                 ));
             }
         };

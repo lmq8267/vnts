@@ -131,6 +131,11 @@ jobs:
         run: |
           git clone https://github.com/lbl8603/vnts -b ${{ needs.check.outputs.ver }} /opt/vnts
           cd /opt/vnts
+          if [[ $TARGET == aarch64-unknown-linux-musl ]] || [[ $TARGET == armv7-unknown-linux-musleabi ]] || [[ $TARGET == arm-unknown-linux-musleabi ]] ; then
+          sed -i 's|key/|/tmp/key/|g' ./src/cipher/rsa_cipher.rs
+          sed -i 's|create_dir|create_dir_all|g' ./src/cipher/rsa_cipher.rs
+          sed -i 's|let path = PathBuf::from("key");|let path = PathBuf::from("/tmp/key");|g' ./src/cipher/rsa_cipher.rs
+          fi
           sed -i 's|= "3.2.0"|= "=3.2.0"|g' ./Cargo.toml
           cargo build --release --target $TARGET --features $FEATURES
       - name: 打包压缩

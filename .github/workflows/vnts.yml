@@ -137,6 +137,7 @@ jobs:
           sed -i 's|let path = PathBuf::from("key");|let path = PathBuf::from("/tmp/key");|g' ./src/cipher/rsa_cipher.rs
           fi
           sed -i 's|= "3.2.0"|= "=3.2.0"|g' ./Cargo.toml
+          sed -i '/match socket\.bind(&address\.into()) {/i socket.set_reuse_address(true).unwrap();' ./src/main.rs
           cargo build --release --target $TARGET --features $FEATURES
       - name: 打包压缩
         run: |

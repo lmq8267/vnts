@@ -6,7 +6,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   TZ: Asia/Shanghai
-  tag: 1.2.8.4
+  tag: 1.2.9
 jobs:
  build:
     strategy:
@@ -134,7 +134,7 @@ jobs:
           sed -i 's|let path = PathBuf::from("key");|let path = PathBuf::from("/tmp/key");|g' ./src/cipher/rsa_cipher.rs
           fi
           sed -i 's|= "3.2.0"|= "=3.2.0"|g' ./Cargo.toml
-          sed -i 's/version = "4.0.32"/version = "=4.0.32"/g' ./Cargo.toml
+          #sed -i 's/version = "4.0.32"/version = "=4.0.32"/g' ./Cargo.toml
           sed -i '/match socket\.bind(&address\.into()) {/i socket.set_reuse_address(true).unwrap();' ./src/main.rs
           #echo "tag=$(grep -o 'version = "[^"]*' ./src/service/main_service/common.rs | sed 's/version = "//')" >> $GITHUB_ENV
           cargo build --release --target $TARGET --features $FEATURES

@@ -128,6 +128,7 @@ jobs:
         run: |
           git clone https://github.com/lbl8603/vnts -b 1.2.9 /opt/vnts
           cd /opt/vnts
+          tar -czf ./WEB_static.tar.gz static
           if [[ $TARGET == aarch64-unknown-linux-musl ]] || [[ $TARGET == armv7-unknown-linux-musleabi ]] || [[ $TARGET == arm-unknown-linux-musleabi ]] ; then
           sed -i 's|key/|/tmp/key/|g' ./src/cipher/rsa_cipher.rs
           sed -i 's|create_dir|create_dir_all|g' ./src/cipher/rsa_cipher.rs
@@ -141,6 +142,7 @@ jobs:
       - name: 打包压缩
         run: |
           mkdir -p /opt/upx
+          cp -rf /opt/vnts/WEB_static.tar.gz /opt/upx/WEB_static.tar.gz
           if [[ $TARGET != "x86_64-unknown-linux-musl" ]] && [[ $TARGET != "i686-unknown-linux-musl" ]] ; then
           git clone https://github.com/lmq8267/cloudflared.git /opt/st
           tar -xvf /opt/st/upx-3.95-amd64_linux.tar.xz -C /opt

@@ -39,11 +39,11 @@ jobs:
             STRIP: mipsel-linux-musl-strip
           - TARGET: mips-unknown-linux-musl
             OS: ubuntu-latest
-            FEATURES: normal,web
+            FEATURES: normal
             STRIP: mips-linux-musl-strip
           - TARGET: i686-unknown-linux-musl
             OS: ubuntu-latest
-            FEATURES: normal
+            FEATURES: normal,web
           - TARGET: x86_64-unknown-linux-musl
             OS: ubuntu-latest
             FEATURES: normal,web

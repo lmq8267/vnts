@@ -88,8 +88,8 @@ jobs:
               sudo ln -s /opt/musl_gcc/$MUSL_URI/bin/*gcc /usr/bin/
             fi
             if [[ $TARGET == mips-unknown-linux-gnu ]] || [[ $TARGET == mipsel-unknown-linux-musl ]] ; then
-            rustup install 1.72.1
-            rustup default 1.72.1
+            rustup install 1.71.1
+            rustup default 1.71.1
             fi
             sudo timedatectl set-timezone "Asia/Shanghai"
             cat >>~/.cargo/config <<EOF

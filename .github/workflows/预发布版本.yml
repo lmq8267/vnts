@@ -78,7 +78,7 @@ jobs:
                 MUSL_URI=arm-linux-musleabi-cross
                 ;;
               mips-unknown-linux-gnu)
-                sudo apt-get update && sudo apt-get install -qq gcc-mips-linux-gnu
+                sudo apt-get update && sudo apt-get install -qq -y gcc-mips-linux-gnu
                 ;;
             esac
             if [[ $TARGET =~ "x86_64-unknown-linux-musl" ]] || [[ $TARGET =~ "i686-unknown-linux-musl" ]] ; then

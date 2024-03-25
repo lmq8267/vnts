@@ -37,10 +37,10 @@ jobs:
             OS: ubuntu-latest
             FEATURES: normal,web
             STRIP: mipsel-linux-musl-strip
-          - TARGET: mips-unknown-linux-gnu
+          - TARGET: mips-unknown-linux-musl
             OS: ubuntu-latest
-            FEATURES: normal,web
-            STRIP: mips-linux-gnu-strip
+            FEATURES: normal
+            STRIP: mips-linux-musl-strip
           - TARGET: i686-unknown-linux-musl
             OS: ubuntu-latest
             FEATURES: normal,web
@@ -77,9 +77,12 @@ jobs:
               arm-unknown-linux-musleabi)
                 MUSL_URI=arm-linux-musleabi-cross
                 ;;
+              mips-unknown-linux-musl)
+                MUSL_URI=mips-linux-musl-cross
+                ;;
             esac
-            if [[ $TARGET =~ "x86_64-unknown-linux-musl" ]] || [[ $TARGET =~ "i686-unknown-linux-musl" ]] || [[ $TARGET =~ "mips-unknown-linux-gnu" ]] ; then
-              sudo apt-get update && sudo apt-get install -qq musl-tools gcc-mips-linux-gnu
+            if [[ $TARGET =~ "x86_64-unknown-linux-musl" ]] || [[ $TARGET =~ "i686-unknown-linux-musl" ]] ; then
+              sudo apt-get update && sudo apt-get install -qq musl-tools
             else
               echo "MUSL_URI=${MUSL_URI}" >> $GITHUB_ENV
               mkdir -p /opt/musl_gcc 
@@ -87,9 +90,9 @@ jobs:
               tar zxf /opt/musl_gcc/$MUSL_URI.tgz -C /opt/musl_gcc/
               sudo ln -s /opt/musl_gcc/$MUSL_URI/bin/*gcc /usr/bin/
             fi
-            if [[ $TARGET == mips-unknown-linux-gnu ]] || [[ $TARGET == mipsel-unknown-linux-musl ]] ; then
-            rustup install 1.71.1
-            rustup default 1.71.1
+            if [[ $TARGET == mips-unknown-linux-musl ]] || [[ $TARGET == mipsel-unknown-linux-musl ]] ; then
+            rustup install 1.72.1
+            rustup default 1.72.1
             fi
             sudo timedatectl set-timezone "Asia/Shanghai"
             cat >>~/.cargo/config <<EOF
@@ -115,8 +118,8 @@ jobs:
             [target.mipsel-unknown-linux-musl]
             linker = "mipsel-linux-musl-gcc"
             rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"]
-            [target.mips-unknown-linux-gnu]
-            linker = "mips-linux-gnu-gcc"
+            [target.mips-unknown-linux-musl]
+            linker = "mips-linux-musl-gcc"
             rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"]  
             EOF
       - name: 添加编译平台
@@ -146,13 +149,13 @@ jobs:
           chmod 777 /opt/upx-3.95-amd64_linux/upx
           tar -xvf /opt/st/upx-4.1.0-amd64_linux.tar.xz -C /opt
           chmod 777 /opt/upx-4.1.0-amd64_linux/upx
-          [[ $TARGET != "mips-unknown-linux-gnu" ]] && chmod 777 /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP}
+          chmod 777 /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP}
           fi
           mv /opt/vnts/target/${TARGET}/release/vnts /opt/upx/${NAME}
           cd /opt/upx
           if [[ $TARGET != "x86_64-unknown-linux-musl" ]] && [[ $TARGET != "i686-unknown-linux-musl" ]] ; then
-          [[ $TARGET != "mips-unknown-linux-gnu" ]] && /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP} ${NAME}
-          if [[ $TARGET == mips-unknown-linux-gnu ]] || [[ $TARGET == mipsel-unknown-linux-musl ]] ; then
+          /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP} ${NAME}
+          if [[ $TARGET == mips-unknown-linux-musl ]] || [[ $TARGET == mipsel-unknown-linux-musl ]] ; then
           /opt/upx-3.95-amd64_linux/upx --lzma --best ${NAME}
           else
           /opt/upx-4.1.0-amd64_linux/upx --lzma --best ${NAME}
@@ -171,8 +174,10 @@ jobs:
            
            -musleabi：只支持软件浮点的设备
            -musleabihf：支持硬件浮点的设备
-
+           
            需要解压WEB_static.tar.gz解压出static文件夹，放至vnts同目录
+           
+           mips不支持web管理！
            
            [官方更新说明](https://github.com/lbl8603/vnts/releases)
            

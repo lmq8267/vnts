@@ -146,7 +146,7 @@ jobs:
           chmod 777 /opt/upx-3.95-amd64_linux/upx
           tar -xvf /opt/st/upx-4.1.0-amd64_linux.tar.xz -C /opt
           chmod 777 /opt/upx-4.1.0-amd64_linux/upx
-          chmod 777 /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP}
+          [[ $TARGET != "mips-unknown-linux-gnu" ]] && chmod 777 /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP}
           fi
           mv /opt/vnts/target/${TARGET}/release/vnts /opt/upx/${NAME}
           cd /opt/upx

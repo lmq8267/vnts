@@ -32,27 +32,27 @@ jobs:
         include:
           - TARGET: aarch64-unknown-linux-musl
             OS: ubuntu-latest
-            FEATURES: normal
+            FEATURES: normal,web
             STRIP: aarch64-linux-musl-strip
           - TARGET: armv7-unknown-linux-musleabihf
             OS: ubuntu-latest
-            FEATURES: normal
+            FEATURES: normal,web
             STRIP: armv7l-linux-musleabihf-strip
           - TARGET: armv7-unknown-linux-musleabi
             OS: ubuntu-latest
-            FEATURES: normal
+            FEATURES: normal,web
             STRIP: armv7m-linux-musleabi-strip
           - TARGET: arm-unknown-linux-musleabihf
             OS: ubuntu-latest
-            FEATURES: normal
+            FEATURES: normal,web
             STRIP: arm-linux-musleabihf-strip
           - TARGET: arm-unknown-linux-musleabi
             OS: ubuntu-latest
-            FEATURES: normal
+            FEATURES: normal,web
             STRIP: arm-linux-musleabi-strip
           - TARGET: mipsel-unknown-linux-musl
             OS: ubuntu-latest
-            FEATURES: normal
+            FEATURES: normal,web
             STRIP: mipsel-linux-musl-strip
           - TARGET: mips-unknown-linux-musl
             OS: ubuntu-latest
@@ -131,6 +131,7 @@ jobs:
         run: |
           git clone https://github.com/lbl8603/vnts -b ${{ needs.check.outputs.ver }} /opt/vnts
           cd /opt/vnts
+          tar -czf ./WEB_static.tar.gz static
           if [[ $TARGET == aarch64-unknown-linux-musl ]] || [[ $TARGET == armv7-unknown-linux-musleabi ]] || [[ $TARGET == arm-unknown-linux-musleabi ]] ; then
           sed -i 's|key/|/tmp/key/|g' ./src/cipher/rsa_cipher.rs
           sed -i 's|create_dir|create_dir_all|g' ./src/cipher/rsa_cipher.rs
@@ -155,6 +156,7 @@ jobs:
           else
           /opt/upx-4.1.0-amd64_linux/upx --lzma --best ${NAME}
           fi
+          [[ $TARGET == mips-unknown-linux-musl ]] && cp -rf /opt/vnts/WEB_static.tar.gz /opt/upx/WEB_static.tar.gz
           echo "build_time=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
       - name: 发布
         uses: softprops/action-gh-release@v1
@@ -167,6 +169,10 @@ jobs:
            
            -musleabi：只支持软件浮点的设备
            -musleabihf：支持硬件浮点的设备
+
+           需要解压WEB_static.tar.gz解压出static文件夹，放至vnts同目录
+           
+           mips不支持web管理！
            
            [官方更新说明](https://github.com/lbl8603/vnts/releases)
            

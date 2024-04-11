@@ -126,7 +126,7 @@ jobs:
         run: rustup target add $TARGET
       - name: 开始编译
         run: |
-          git clone https://github.com/lbl8603/vnts -b 1.2.9 /opt/vnts
+          git clone https://github.com/lbl8603/vnts /opt/vnts
           cd /opt/vnts
           tar -czf ./WEB_static.tar.gz static
           if [[ $TARGET == aarch64-unknown-linux-musl ]] || [[ $TARGET == armv7-unknown-linux-musleabi ]] || [[ $TARGET == arm-unknown-linux-musleabi ]] ; then

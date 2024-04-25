@@ -1,4 +1,12 @@
 # 服务端vnts - mipsel
+<p align="center">
+<a href="https://github.com/lmq8267/vnts/releases"><img src="https://img.shields.io/github/downloads/lmq8267/vnts/total">
+<a href="https://github.com/lmq8267/vnts/graphs/contributors"><img src="https://img.shields.io/github/contributors-anon/lmq8267/vnts">
+<a href="https://github.com/lmq8267/vnts/releases/"><img src="https://img.shields.io/github/release/lmq8267/vnts">
+<a href="https://github.com/lmq8267/vnts/issues"><img src="https://img.shields.io/github/issues-raw/lmq8267/vnts">
+<a href="https://github.com/lmq8267/vnts/discussions"><img src="https://img.shields.io/github/discussions/lmq8267/vnts">
+</p>
+  
 客户端https://github.com/lmq8267/vnt
 
 

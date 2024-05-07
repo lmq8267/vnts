@@ -169,8 +169,6 @@ jobs:
            
            -musleabi：只支持软件浮点的设备
            -musleabihf：支持硬件浮点的设备
-
-           需要解压WEB_static.tar.gz解压出static文件夹，放至vnts同目录
            
            mips不支持web管理！
            

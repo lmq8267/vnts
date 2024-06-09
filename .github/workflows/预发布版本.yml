@@ -2,11 +2,21 @@ name: 编译预发布版本vnts
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: '发布prerelease的版本号'
+        required: true
+        default: '9.9.9'
+      branch:
+        description: '编译vnt-cli的lbl8603/vnt分支或版本号，默认主分支master'
+        required: true
+        default: 'master'
 
 env:
   CARGO_TERM_COLOR: always
   TZ: Asia/Shanghai
-  tag: 1.2.9.7
+  tag: "${{ github.event.inputs.tag }}"
+  branch: "${{ github.event.inputs.branch }}"
 jobs:
  build:
     strategy:
@@ -126,7 +136,7 @@ jobs:
         run: rustup target add $TARGET
       - name: 开始编译
         run: |
-          git clone https://github.com/lbl8603/vnts /opt/vnts
+          git clone -b ${{ env.branch }} https://github.com/lbl8603/vnts /opt/vnts
           cd /opt/vnts
           tar -czf ./WEB_static.tar.gz static
           #if [[ $TARGET == aarch64-unknown-linux-musl ]] || [[ $TARGET == armv7-unknown-linux-musleabi ]] || [[ $TARGET == arm-unknown-linux-musleabi ]] ; then

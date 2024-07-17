@@ -19,7 +19,7 @@ jobs:
   - name: 检查更新
     id: getversion
     run: |
-      ver=`curl https://api.github.com/repos/lbl8603/vnts/releases/latest | jq -r '.tag_name'`
+      ver=`curl https://api.github.com/repos/vnt-dev/vnts/releases/latest | jq -r '.tag_name'`
       cver=`curl https://api.github.com/repos/lmq8267/vnts/releases/latest | jq -r '.tag_name'`
       echo "ver=${ver}" >> $GITHUB_OUTPUT
       echo "cver=${cver}" >> $GITHUB_OUTPUT
@@ -129,7 +129,7 @@ jobs:
         run: rustup target add $TARGET
       - name: 开始编译
         run: |
-          git clone https://github.com/lbl8603/vnts -b ${{ needs.check.outputs.ver }} /opt/vnts
+          git clone https://github.com/vnt-dev/vnts -b ${{ needs.check.outputs.ver }} /opt/vnts
           cd /opt/vnts
           tar -czf ./WEB_static.tar.gz static
           #if [[ $TARGET == aarch64-unknown-linux-musl ]] || [[ $TARGET == armv7-unknown-linux-musleabi ]] || [[ $TARGET == arm-unknown-linux-musleabi ]] ; then
@@ -172,7 +172,7 @@ jobs:
            
            mips不支持web管理！
            
-           [官方更新说明](https://github.com/lbl8603/vnts/releases)
+           [官方更新说明](https://github.com/vnt-dev/vnts/releases)
            
           tag_name: ${{ needs.check.outputs.ver }}
           files: |

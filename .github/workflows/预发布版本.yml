@@ -51,9 +51,9 @@ jobs:
             OS: ubuntu-latest
             FEATURES: normal
             STRIP: mips-linux-musl-strip
-          - TARGET: i686-unknown-linux-musl
-            OS: ubuntu-latest
-            FEATURES: normal,web
+          #- TARGET: i686-unknown-linux-musl
+            #OS: ubuntu-latest
+            #FEATURES: normal,web
           - TARGET: x86_64-unknown-linux-musl
             OS: ubuntu-latest
             FEATURES: normal,web

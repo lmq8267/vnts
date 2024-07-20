@@ -8,7 +8,7 @@ on:
         required: true
         default: '9.9.9'
       branch:
-        description: '编译vnt-cli的lbl8603/vnt分支或版本号，默认主分支master'
+        description: '编译vnts的vnt-dev/vnt分支或版本号，默认主分支master'
         required: true
         default: 'master'
 
@@ -136,7 +136,7 @@ jobs:
         run: rustup target add $TARGET
       - name: 开始编译
         run: |
-          git clone -b ${{ env.branch }} https://github.com/lbl8603/vnts /opt/vnts
+          git clone -b ${{ env.branch }} https://github.com/vnt-dev/vnts /opt/vnts
           cd /opt/vnts
           tar -czf ./WEB_static.tar.gz static
           #if [[ $TARGET == aarch64-unknown-linux-musl ]] || [[ $TARGET == armv7-unknown-linux-musleabi ]] || [[ $TARGET == arm-unknown-linux-musleabi ]] ; then
@@ -185,7 +185,7 @@ jobs:
            
            mips不支持web管理！
            
-           [官方更新说明](https://github.com/lbl8603/vnts/releases)
+           [官方更新说明](https://github.com/vnt-dev/vnts/releases)
            
           #tag_name: ${{ env.tag }}
           tag_name: ${{ env.tag }}

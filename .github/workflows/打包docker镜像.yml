@@ -29,23 +29,23 @@ jobs:
         run: |
           mkdir -p /opt/vnt
           cd /opt/vnt
-          wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tag }}/vnts_x86_64-unknown-linux-musl -P /opt/vnt/
+          wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tags }}/vnts_x86_64-unknown-linux-musl -P /opt/vnt/
           chmod a+x vnts_x86_64-unknown-linux-musl
           mv vnts_x86_64-unknown-linux-musl vnts_amd64
 
-          #wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tag }}/vnts_i686-unknown-linux-musl -P /opt/vnt/
+          #wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tags }}/vnts_i686-unknown-linux-musl -P /opt/vnt/
           #chmod a+x vnts_i686-unknown-linux-musl
           #mv vnts_i686-unknown-linux-musl vnts_386
 
-          wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tag }}/vnts_aarch64-unknown-linux-musl -P /opt/vnt/
+          wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tags }}/vnts_aarch64-unknown-linux-musl -P /opt/vnt/
           chmod a+x vnts_aarch64-unknown-linux-musl
           mv vnts_aarch64-unknown-linux-musl vnts_arm64
           
-          wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tag }}/vnts_armv7-unknown-linux-musleabi -P /opt/vnt/
+          wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tags }}/vnts_armv7-unknown-linux-musleabi -P /opt/vnt/
           chmod a+x vnts_armv7-unknown-linux-musleabi
           mv vnts_armv7-unknown-linux-musleabi vnts_armv7
 
-          wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tag }}/vnts_arm-unknown-linux-musleabi -P /opt/vnt/
+          wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tags }}/vnts_arm-unknown-linux-musleabi -P /opt/vnt/
           chmod a+x vnts_arm-unknown-linux-musleabi
           mv vnts_arm-unknown-linux-musleabi vnts_armv5
           

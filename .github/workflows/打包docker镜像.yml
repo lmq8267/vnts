@@ -63,7 +63,6 @@ jobs:
          git clone https://github.com/lmq8267/vnts /opt/src
          mv /opt/src/Dockerfile /opt/vnt/Dockerfile
          cd /opt/vnt
-         sed -i '/RUN chmod +x \/usr\/bin\/vnts/i ADD static \/usr\/bin\/static' ./Dockerfile
          sed -i '/RUN chmod +x \/usr\/bin\/vnts/i WORKDIR \/usr\/bin' ./Dockerfile
          sed -i 's|ENTRYPOINT \["/usr/bin/vnts"\]|ENTRYPOINT ["./vnts"]|' ./Dockerfile
          cat ./Dockerfile

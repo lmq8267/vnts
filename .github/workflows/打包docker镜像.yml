@@ -1,0 +1,127 @@
+name: 打包docker镜像
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '请填写打包镜像的版本号，在Releases页面查看已发布的版本号'
+        required: true
+        default: ''
+      latest:
+        description: '是否打包成最新latest镜像'
+        required: true
+        default: true
+        type: boolean
+      rel:
+        description: '是否发布离线镜像包'
+        required: true
+        default: true
+        type: boolean
+
+env:
+  tags: "${{ github.event.inputs.tag }}"
+  
+jobs:
+ build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 下载二进制文件
+        run: |
+          mkdir -p /opt/vnt
+          cd /opt/vnt
+          wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tag }}/vnts_x86_64-unknown-linux-musl -P /opt/vnt/
+          chmod a+x vnts_x86_64-unknown-linux-musl
+          mv vnts_x86_64-unknown-linux-musl vnts_amd64
+
+          #wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tag }}/vnts_i686-unknown-linux-musl -P /opt/vnt/
+          #chmod a+x vnts_i686-unknown-linux-musl
+          #mv vnts_i686-unknown-linux-musl vnts_386
+
+          wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tag }}/vnts_aarch64-unknown-linux-musl -P /opt/vnt/
+          chmod a+x vnts_aarch64-unknown-linux-musl
+          mv vnts_aarch64-unknown-linux-musl vnts_arm64
+          
+          wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tag }}/vnts_armv7-unknown-linux-musleabi -P /opt/vnt/
+          chmod a+x vnts_armv7-unknown-linux-musleabi
+          mv vnts_armv7-unknown-linux-musleabi vnts_armv7
+
+          wget -c https://github.com/lmq8267/vnts/releases/download/${{ env.tag }}/vnts_arm-unknown-linux-musleabi -P /opt/vnt/
+          chmod a+x vnts_arm-unknown-linux-musleabi
+          mv vnts_arm-unknown-linux-musleabi vnts_armv5
+          
+      - name: Setup QEMU
+        uses: dbhi/qus/action@main
+      - name: 设置 Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+         username: lmq8267
+         password: ${{ secrets.DOCKER_TOKEN }}
+      - name: 构建发布
+        run: |
+         git clone https://github.com/lmq8267/vnts /opt/src
+         mv /opt/src/Dockerfile /opt/vnt/Dockerfile
+         cd /opt/vnt
+         sed -i '/RUN chmod +x \/usr\/bin\/vnts/i ADD static \/usr\/bin\/static' ./Dockerfile
+         sed -i '/RUN chmod +x \/usr\/bin\/vnts/i WORKDIR \/usr\/bin' ./Dockerfile
+         sed -i 's|ENTRYPOINT \["/usr/bin/vnts"\]|ENTRYPOINT ["./vnts"]|' ./Dockerfile
+         cat ./Dockerfile
+      - name: Build and Push Docker Latest Image
+        if: github.event.inputs.latest == 'true'
+        uses: docker/build-push-action@v5
+        with:
+         push: true
+         tags: |
+          lmq8267/vnts:${{ env.tags }}
+          lmq8267/vnts:latest
+         platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v5
+         context: /opt/vnt
+      - name: Build and Push Docker Image
+        if: github.event.inputs.latest == 'false'
+        uses: docker/build-push-action@v5
+        with:
+         push: true
+         tags: |
+          lmq8267/vnts:${{ env.tags }}
+         platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v5
+         context: /opt/vnt
+      - name: Save Docker Image
+        if: github.event.inputs.rel == 'true'
+        run: |
+          mkdir -p /opt/dk
+          docker pull --platform linux/amd64 lmq8267/vnts:${{ env.tags }}
+          docker save -o /opt/dk/vnts-amd64-docker.tar lmq8267/vnts:${{ env.tags }}
+
+          #docker pull --platform linux/386 lmq8267/vnts:${{ env.tags }}
+          #docker save -o /opt/dk/vnts-386-docker.tar lmq8267/vnts:${{ env.tags }}
+
+          docker pull --platform linux/arm64 lmq8267/vnts:${{ env.tags }}
+          docker save -o /opt/dk/vnts-arm64-docker.tar lmq8267/vnts:${{ env.tags }}
+
+          docker pull --platform linux/arm/v7 lmq8267/vnts:${{ env.tags }}
+          docker save -o /opt/dk/vnts-armv7-docker.tar lmq8267/vnts:${{ env.tags }}
+
+          docker pull --platform linux/arm/v5 lmq8267/vnts:${{ env.tags }}
+          docker save -o /opt/dk/vnts-armv5-docker.tar lmq8267/vnts:${{ env.tags }}
+          echo "build_time=$(TZ=UTC-8 date +%Y-%m-%d' '%H:%M:%S)" >> $GITHUB_ENV
+      - name: 发布
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ secrets.c8 }}
+          body: |
+           > ### 编译时间 ：${{ env.build_time }}
+           
+           这是各平台的压缩版程序
+           
+           -musleabi：只支持软件浮点的设备
+           -musleabihf：支持硬件浮点的设备
+           -docker.tar 离线docker镜像包
+           
+           mips不支持web管理！
+           
+           [官方更新说明](https://github.com/vnt-dev/vnts/releases)
+           
+          tag_name: ${{ env.tags }}
+          files: /opt/dk/*
+          

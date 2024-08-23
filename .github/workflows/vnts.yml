@@ -1,8 +1,8 @@
 name: 编译压缩版vnts
 
 on:
-  #schedule:
-    #- cron: '0 3 * * *'
+  schedule:
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 env:
@@ -148,24 +148,20 @@ jobs:
           #fi
           #sed -i 's|= "3.2.0"|= "=3.2.0"|g' ./Cargo.toml
           cargo build --release --target $TARGET --features $FEATURES
+      - name: 安装 UPX
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          version: latest
+          install-only: true
       - name: 打包压缩
         run: |
           mkdir -p /opt/upx
           mv /opt/vnts/target/${TARGET}/release/vnts /opt/upx/${NAME}
           if [[ $TARGET != "x86_64-unknown-linux-musl" ]] ; then
-           git clone https://github.com/lmq8267/cloudflared.git /opt/st
-           tar -xvf /opt/st/upx-3.95-amd64_linux.tar.xz -C /opt
-           chmod 777 /opt/upx-3.95-amd64_linux/upx
-           tar -xvf /opt/st/upx-4.1.0-amd64_linux.tar.xz -C /opt
-           chmod 777 /opt/upx-4.1.0-amd64_linux/upx
            chmod 777 /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP}
            cd /opt/upx
            /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP} ${NAME}
-            if [[ $TARGET == mips-unknown-linux-musl ]] || [[ $TARGET == mipsel-unknown-linux-musl ]] ; then
-             /opt/upx-3.95-amd64_linux/upx --lzma --best ${NAME}
-            else
-             /opt/upx-4.1.0-amd64_linux/upx --lzma --best ${NAME}
-            fi
+           upx --lzma --best ${NAME}
            [[ $TARGET == mips-unknown-linux-musl ]] && cp -rf /opt/vnts/WEB_static.tar.gz /opt/upx/WEB_static.tar.gz
           fi
           echo "build_time=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
@@ -194,4 +190,15 @@ jobs:
        with:
         token: ${{ secrets.c8 }}
         retain_days: 2
-        keep_minimum_runs: 0
+        keep_minimum_runs: 1
+ keepalive-workflow:
+    # github超过60天未提交将自动停止工作流
+    name: 工作流保活 
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gautamkrishnar/keepalive-workflow@v2
+        #with:
+          #use_api: true

@@ -137,7 +137,6 @@ jobs:
             rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"]  
             EOF
       - name: 添加编译平台
-        if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
         run: rustup target add $TARGET
       - name: 开始编译
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
@@ -155,33 +154,14 @@ jobs:
           cargo build --release --target $TARGET --features $FEATURES
       - name: 编译FreeBSD
         if: ${{ matrix.TARGET == 'x86_64-unknown-freebsd' }}
-        uses: cross-platform-actions/action@v0.23.0
-        with:
-          operating_system: freebsd
-          architecture: x86-64
-          version: '13.2'
-          shell: bash
-          memory: 5G
-          cpu_count: 4
-          run: |
-              sudo pkg install -y git protobuf
-              homedir=$(pwd)
-              sudo mkdir -p /opt
-              sudo chown -R $(whoami) /opt/
-              curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-              source $HOME/.cargo/env
-              rustup set auto-self-update disable
-              rustup install 1.72.1
-              rustup default 1.72.1
-              git clone https://github.com/vnt-dev/vnts -b ${{ env.branch }} /opt/vnts
-              cd /opt/vnts
-              export CC=clang
-              export CXX=clang++
-              export CARGO_TERM_COLOR=always
-              export RUSTFLAGS="-C opt-level=z -C target-cpu=native -C link-arg=-s"
-              cargo build --release --target x86_64-unknown-freebsd --features $FEATURES
-              ./target/${{ env.TARGET }}/release/vnts -h
-              mv -f target/${{ env.TARGET }}/release/vnts ${homedir}/vnts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu qemu-user-static binfmt-support build-essential
+          git clone https://github.com/vnt-dev/vnts -b ${{ needs.check.outputs.ver }} /opt/vnts
+          cd /opt/vnts
+          cargo install cross --git https://github.com/cross-rs/cross
+          sed -i 's/const CLOCK_ID: ClockId = ClockId::CLOCK_BOOTTIME;/const CLOCK_ID: ClockId = ClockId::CLOCK_MONOTONIC;/g' ./lib/boringtun/src/sleepyinstant/unix.rs
+          cross build --target $TARGET --release --features $FEATURES
       - name: 打包压缩
         run: |
           mkdir -p /opt/upx
@@ -193,10 +173,6 @@ jobs:
           tar -xvf /opt/st/upx-4.1.0-amd64_linux.tar.xz -C /opt
           chmod 777 /opt/upx-4.1.0-amd64_linux/upx
           chmod 777 /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP}
-          fi
-          if [[ $TARGET == 'x86_64-unknown-freebsd' ]]; then
-          mkdir -p /opt/vnts/target/${{ env.TARGET }}/release
-          mv -f ./vnts /opt/vnts/target/${{ env.TARGET }}/release/vnts
           fi
           mv /opt/vnts/target/${TARGET}/release/vnts /opt/upx/${NAME}
           cd /opt/upx

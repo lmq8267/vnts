@@ -57,6 +57,9 @@ jobs:
           - TARGET: x86_64-unknown-linux-musl
             OS: ubuntu-latest
             FEATURES: normal,web
+          - TARGET: x86_64-unknown-freebsd
+            OS: ubuntu-latest
+            FEATURES: normal,web
     runs-on: ${{ matrix.OS }}
     env:
       NAME: vnts_${{ matrix.TARGET }}
@@ -67,6 +70,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: 设置编译环境
+        if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
         run: |
             case $TARGET in 
               mipsel-unknown-linux-musl)
@@ -133,8 +137,10 @@ jobs:
             rustflags = ["-C", "target-feature=+crt-static","-C", "strip=symbols"]  
             EOF
       - name: 添加编译平台
+        if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
         run: rustup target add $TARGET
       - name: 开始编译
+        if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
         run: |
           git clone -b ${{ env.branch }} https://github.com/vnt-dev/vnts /opt/vnts
           cd /opt/vnts
@@ -147,11 +153,40 @@ jobs:
           #sed -i 's|= "3.2.0"|= "=3.2.0"|g' ./Cargo.toml
           #echo "tag=$(grep -o 'version = "[^"]*' ./src/service/main_service/common.rs | sed 's/version = "//')" >> $GITHUB_ENV
           cargo build --release --target $TARGET --features $FEATURES
+      - name: 编译FreeBSD
+        if: ${{ matrix.TARGET == 'x86_64-unknown-freebsd' }}
+        uses: cross-platform-actions/action@v0.23.0
+        with:
+          operating_system: freebsd
+          architecture: x86-64
+          version: '13.2'
+          shell: bash
+          memory: 5G
+          cpu_count: 4
+          run: |
+              sudo pkg install -y git protobuf
+              homedir=$(pwd)
+              sudo mkdir -p /opt
+              sudo chown -R $(whoami) /opt/
+              curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+              source $HOME/.cargo/env
+              rustup set auto-self-update disable
+              rustup install 1.72.1
+              rustup default 1.72.1
+              git clone https://github.com/vnt-dev/vnts -b ${{ env.branch }} /opt/vnts
+              cd /opt/vnts
+              export CC=clang
+              export CXX=clang++
+              export CARGO_TERM_COLOR=always
+              export RUSTFLAGS="-C opt-level=z -C target-cpu=native -C link-arg=-s"
+              cargo build --release --target x86_64-unknown-freebsd --features $FEATURES
+              ./target/${{ env.TARGET }}/release/vnts -h
+              mv -f target/${{ env.TARGET }}/release/vnts ${homedir}/vnts
       - name: 打包压缩
         run: |
           mkdir -p /opt/upx
           [[ $TARGET == aarch64-unknown-linux-musl ]] && cp -rf /opt/vnts/WEB_static.tar.gz /opt/upx/WEB_static.tar.gz
-          if [[ $TARGET != "x86_64-unknown-linux-musl" ]] && [[ $TARGET != "i686-unknown-linux-musl" ]] ; then
+          if [[ $TARGET != "x86_64-unknown-linux-musl" ]] && [[ $TARGET != "i686-unknown-linux-musl" ]] && [[ $TARGET != "x86_64-unknown-freebsd" ]] ; then
           git clone https://github.com/lmq8267/cloudflared.git /opt/st
           tar -xvf /opt/st/upx-3.95-amd64_linux.tar.xz -C /opt
           chmod 777 /opt/upx-3.95-amd64_linux/upx
@@ -159,9 +194,13 @@ jobs:
           chmod 777 /opt/upx-4.1.0-amd64_linux/upx
           chmod 777 /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP}
           fi
+          if [[ $TARGET == 'x86_64-unknown-freebsd' ]]; then
+          mkdir -p /opt/vnts/target/${{ env.TARGET }}/release
+          mv -f ./vnts /opt/vnts/target/${{ env.TARGET }}/release/vnts
+          fi
           mv /opt/vnts/target/${TARGET}/release/vnts /opt/upx/${NAME}
           cd /opt/upx
-          if [[ $TARGET != "x86_64-unknown-linux-musl" ]] && [[ $TARGET != "i686-unknown-linux-musl" ]] ; then
+          if [[ $TARGET != "x86_64-unknown-linux-musl" ]] && [[ $TARGET != "i686-unknown-linux-musl" ]] && [[ $TARGET != "x86_64-unknown-freebsd" ]] ; then
           /opt/musl_gcc/${{ env.MUSL_URI }}/bin/${STRIP} ${NAME}
           if [[ $TARGET == mips-unknown-linux-musl ]] || [[ $TARGET == mipsel-unknown-linux-musl ]] ; then
           /opt/upx-3.95-amd64_linux/upx --lzma --best ${NAME}

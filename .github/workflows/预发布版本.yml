@@ -157,7 +157,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y qemu qemu-user-static binfmt-support build-essential
-          git clone https://github.com/vnt-dev/vnts -b ${{ needs.check.outputs.ver }} /opt/vnts
+          git clone https://github.com/vnt-dev/vnts -b ${{ env.branch }} /opt/vnts
           cd /opt/vnts
           cargo install cross --git https://github.com/cross-rs/cross
           sed -i 's/const CLOCK_ID: ClockId = ClockId::CLOCK_BOOTTIME;/const CLOCK_ID: ClockId = ClockId::CLOCK_MONOTONIC;/g' ./lib/boringtun/src/sleepyinstant/unix.rs

@@ -167,7 +167,7 @@ jobs:
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
         uses: crazy-max/ghaction-upx@v3
         with:
-          version: latest
+          version: v4.2.4
           install-only: true
       - name: 打包压缩
         run: |

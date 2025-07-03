@@ -24,7 +24,7 @@
 
 - cmd
 
-  `docker run --name vnts -p 29872 -p 29870:29870/tcp --restart=always -d lmq8267/vnts -p 29872 -P29870 -U WEB用户名 -W WEB密码`
+  `docker run --name vnts -p 29872 -p 29870:29870/tcp -e TZ=Asia/Shanghai --restart=always -d lmq8267/vnts -p 29872 -P29870 -U WEB用户名 -W WEB密码`
 
 - compose.yaml
 
@@ -38,5 +38,7 @@ services:
         ports:
             - '29870:29870/tcp'
             - '29872'
+        environment:
+            - TZ=Asia/Shanghai
         command: '-p 29872 -P29870 -U WEB用户名 -W WEB密码'
 ```

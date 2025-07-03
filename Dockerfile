@@ -3,7 +3,7 @@ ARG TARGETARCH
 ARG TARGETVARIANT
 
 ADD vnts_$TARGETARCH$TARGETVARIANT /usr/bin/vnts
-RUN apk add --no-cache tzdata
+
 RUN chmod +x /usr/bin/vnts
 
 WORKDIR /app

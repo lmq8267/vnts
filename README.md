@@ -19,3 +19,24 @@
 
 
 更新说明https://github.com/lbl8603/vnts/releases
+
+### Docker部署
+
+- cmd
+
+  `docker run --name vnts -p 29872 -p 29870:29870/tcp --restart=always -d lmq8267/vnts -p 29872 -P29870 -U WEB用户名 -W WEB密码`
+
+- compose.yaml
+
+```
+version: '3.9'
+services:
+    vnts:
+        image: lmq8267/vnts
+        container_name: vnts
+        restart: always
+        ports:
+            - '29870:29870/tcp'
+            - '29872'
+        command: '-p 29872 -P29870 -U WEB用户名 -W WEB密码'
+```

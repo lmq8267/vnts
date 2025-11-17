@@ -13,5 +13,6 @@ EXPOSE 29872/tcp
 EXPOSE 29872/udp
 EXPOSE 29870/tcp
 VOLUME /app
+VOLUME /usr/bin/vnts_wg
 
 ENTRYPOINT ["/usr/bin/vnts"]

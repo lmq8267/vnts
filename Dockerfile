@@ -26,7 +26,7 @@ RUN echo '#!/bin/sh' > /entrypoint.sh && \
     echo '  stdout:' >> /entrypoint.sh && \  
     echo '    kind: console' >> /entrypoint.sh && \  
     echo '    encoder:' >> /entrypoint.sh && \  
-    echo '      pattern: "{d(%Y-%m-%d %H:%M:%S)} {h({l})} {M}:{m}{n}"' >> /entrypoint.sh && \  
+    echo '      pattern: "[{d(%Y-%m-%d %H:%M:%S)}]: {l} 【{M}】:{m}{n}"' >> /entrypoint.sh && \  
     echo 'root:' >> /entrypoint.sh && \  
     echo '  level: info' >> /entrypoint.sh && \  
     echo '  appenders:' >> /entrypoint.sh && \  
